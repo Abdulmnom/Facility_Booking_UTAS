@@ -1,0 +1,191 @@
+/* Bootstrap core — imported in index.js instead (avoids CRA @import order warnings) */
+
+/* ─── Dark Theme Design System ───────────────────────── */
+:root {
+  --bg-page:       #081828;
+  --bg-card:       #0d2137;
+  --bg-card-alt:   #0a1e30;
+  --bg-input:      #081828;
+  --bg-table-hdr:  #1a4f6e;
+  --bg-row-alt:    #0c2540;
+  --clr-teal:      #00c4a7;
+  --clr-teal-dim:  #00a98f;
+  --clr-teal-glow: rgba(0,196,167,.18);
+  --clr-muted:     #7ea8c4;
+  --border-teal:   1px solid #00c4a7;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-page);
+  color: #fff;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Dark Card ──────────────────────────────────────── */
+.dark-card {
+  background: var(--bg-card);
+  border: 1px solid var(--clr-teal);
+  border-radius: 8px;
+  overflow: hidden;
+  color: #fff;
+}
+.dark-card .card-header-label {
+  background: var(--bg-card);
+  border-bottom: 1px solid rgba(0,196,167,.2);
+  color: var(--clr-teal);
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: .72rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 13px 20px;
+}
+
+/* ─── Dark Inputs ────────────────────────────────────── */
+.dark-input {
+  background: var(--bg-input) !important;
+  border: 1.5px solid var(--clr-teal) !important;
+  color: #fff !important;
+  border-radius: 7px !important;
+}
+.dark-input:focus {
+  background: var(--bg-input) !important;
+  color: #fff !important;
+  border-color: var(--clr-teal) !important;
+  box-shadow: 0 0 0 3px var(--clr-teal-glow) !important;
+}
+.dark-input option { background: var(--bg-card); color: #fff; }
+.dark-input::placeholder { color: var(--clr-muted) !important; }
+.form-label { color: var(--clr-muted) !important; font-size: .78rem; margin-bottom: 5px; }
+
+/* ─── Teal Button ────────────────────────────────────── */
+.btn-teal {
+  background: var(--clr-teal) !important;
+  color: #001f18 !important;
+  border: none !important;
+  font-weight: 700 !important;
+  letter-spacing: .04em;
+  border-radius: 7px !important;
+  transition: background .2s !important;
+}
+.btn-teal:hover { background: var(--clr-teal-dim) !important; }
+.btn-teal:disabled { opacity: .5; }
+
+.btn-outline-muted {
+  background: transparent !important;
+  border: 1.5px solid var(--clr-muted) !important;
+  color: var(--clr-muted) !important;
+  border-radius: 7px !important;
+}
+.btn-outline-muted:hover { border-color: #fff !important; color: #fff !important; }
+
+/* ─── Dark Table ─────────────────────────────────────── */
+.dark-table { color: #fff; }
+.dark-table thead tr { background: var(--bg-table-hdr); }
+.dark-table thead th {
+  color: #fff;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  border: none;
+  padding: 13px 16px;
+}
+.dark-table tbody tr { border-bottom: 1px solid rgba(255,255,255,.05); }
+.dark-table tbody tr:nth-child(even) { background: var(--bg-row-alt); }
+.dark-table tbody tr:hover { background: var(--clr-teal-glow); }
+.dark-table tbody td {
+  background: transparent;
+  color: #fff;
+  font-size: .88rem;
+  padding: 12px 16px;
+  border: none;
+  vertical-align: middle;
+}
+.table-responsive { border-radius: 0 0 8px 8px; overflow: hidden; }
+
+/* Table teal footer bar */
+.table-footer-bar {
+  background: var(--clr-teal);
+  color: #001f18;
+  text-align: center;
+  padding: 13px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+/* ─── Status Badges ──────────────────────────────────── */
+.badge-pending   { background:#2d2200; color:#f5c518; border:1px solid #f5c518; padding:3px 10px; border-radius:99px; font-size:.72rem; font-weight:700; }
+.badge-confirmed { background:#002d1e; color:#00c4a7; border:1px solid #00c4a7; padding:3px 10px; border-radius:99px; font-size:.72rem; font-weight:700; }
+.badge-cancelled { background:#2d0a0a; color:#f87171; border:1px solid #f87171; padding:3px 10px; border-radius:99px; font-size:.72rem; font-weight:700; }
+.badge-admin     { background:#1e1040; color:#a78bfa; border:1px solid #a78bfa; padding:3px 10px; border-radius:99px; font-size:.72rem; font-weight:700; }
+.badge-user-role { background:#1a2d3d; color:#7ea8c4; border:1px solid #7ea8c4; padding:3px 10px; border-radius:99px; font-size:.72rem; font-weight:700; }
+
+/* ─── Alerts ─────────────────────────────────────────── */
+.alert-dark-error   { background:#2d0a0a; border:1px solid #f87171; color:#fca5a5; border-radius:7px; padding:10px 14px; font-size:.85rem; }
+.alert-dark-success { background:#002d1e; border:1px solid #00c4a7; color:#6ee7b7; border-radius:7px; padding:10px 14px; font-size:.85rem; }
+
+/* ─── Stat Cards ─────────────────────────────────────── */
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--clr-teal);
+  border-radius: 8px;
+  padding: 22px 24px;
+}
+.stat-label { font-size:.72rem; color:var(--clr-muted); letter-spacing:.1em; text-transform:uppercase; }
+.stat-value { font-size:2.4rem; font-weight:800; color:var(--clr-teal); margin-top:4px; }
+
+/* ─── Nav Tabs (Admin) ───────────────────────────────── */
+.dark-tabs .nav-link {
+  color: var(--clr-muted) !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  background: none !important;
+  font-weight: 600;
+  border-radius: 0 !important;
+  padding: 10px 20px;
+}
+.dark-tabs .nav-link.active {
+  color: var(--clr-teal) !important;
+  border-bottom: 2px solid var(--clr-teal) !important;
+  background: none !important;
+}
+.dark-tabs { border-bottom: 1.5px solid rgba(0,196,167,.25) !important; margin-bottom: 24px; }
+
+/* ─── FullCalendar dark overrides ────────────────────── */
+.fc { color: #fff; }
+.fc .fc-toolbar-title { color: #fff; font-size: 1.1rem; }
+.fc .fc-col-header-cell { background: var(--bg-table-hdr); }
+.fc .fc-col-header-cell-cushion { color: #fff; text-decoration: none; }
+.fc .fc-daygrid-day, .fc .fc-timegrid-slot-lane { background: var(--bg-card); }
+.fc .fc-daygrid-day-number { color: var(--clr-muted); text-decoration: none; }
+.fc .fc-scrollgrid { border-color: rgba(0,196,167,.2) !important; }
+.fc .fc-scrollgrid td, .fc .fc-scrollgrid th { border-color: rgba(0,196,167,.15) !important; }
+.fc .fc-button-primary { background: var(--clr-teal) !important; border-color: var(--clr-teal-dim) !important; color: #001f18 !important; font-weight: 700 !important; }
+.fc .fc-button-primary:hover { background: var(--clr-teal-dim) !important; }
+.fc .fc-button-primary:not(:disabled).fc-button-active { background: var(--clr-teal-dim) !important; box-shadow: none !important; }
+.fc .fc-day-today { background: rgba(0,196,167,.07) !important; }
+.fc .fc-timegrid-now-indicator-line { border-color: var(--clr-teal); }
+.fc .fc-list-day-cushion { background: var(--bg-table-hdr) !important; color: #fff !important; }
+.fc .fc-list-event:hover td { background: var(--clr-teal-glow) !important; }
+.fc .fc-list-event td { background: var(--bg-card); color: #fff; border-color: rgba(0,196,167,.1); }
+
+/* ─── Recharts dark text ─────────────────────────────── */
+.recharts-cartesian-axis-tick-value,
+.recharts-legend-item-text { fill: var(--clr-muted) !important; color: var(--clr-muted) !important; }
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line { stroke: rgba(255,255,255,.08) !important; }
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--clr-teal) !important;
+  border-radius: 7px !important;
+  color: #fff !important;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────── */
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background: var(--bg-page); }
+::-webkit-scrollbar-thumb { background: rgba(0,196,167,.4); border-radius:99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--clr-teal); }

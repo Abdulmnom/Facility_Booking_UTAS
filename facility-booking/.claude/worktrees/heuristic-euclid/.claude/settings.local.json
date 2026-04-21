@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Abdulmnoum/Desktop/programes/Diplome_Project/**)",
+      "Bash(mkdir -p facility-booking-backend/src/config facility-booking-backend/src/models facility-booking-backend/src/middleware facility-booking-backend/src/controllers facility-booking-backend/src/routes facility-booking-backend/src/services)",
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(timeout 8 node server.js)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(npx tailwindcss:*)",
+      "Bash(node_modules/.bin/tailwindcss init:*)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d['version']\\)\")",
+      "Bash(CI=false npm run build)",
+      "Bash(node_modules/.bin/react-scripts build:*)",
+      "Bash(DISABLE_ESLINT_PLUGIN=true node_modules/.bin/react-scripts build)",
+      "Bash(node \"C:\\\\Users\\\\Abdulmnoum\\\\AppData\\\\Local\\\\Temp\\\\make_tasks.js\")",
+      "Bash(npm list:*)",
+      "Bash(npm root:*)",
+      "Bash(node make_tasks.js)",
+      "Bash(python 'C:\\\\Users\\\\Abdulmnoum\\\\AppData\\\\Roaming\\\\Claude\\\\local-agent-mode-sessions\\\\skills-plugin\\\\bc35eb1e-7b53-4a90-8864-2dec003e2d19\\\\868cc9e1-4eb5-48d0-bc69-c311d4de9bc2\\\\skills\\\\docx/scripts/office/validate.py' 'C:\\\\Users\\\\Abdulmnoum\\\\Desktop\\\\programes\\\\Diplome_Project\\\\Team_Tasks.docx')",
+      "Bash(python -c \"import zipfile; z=zipfile.ZipFile\\('C:\\\\\\\\\\\\\\\\Users\\\\\\\\\\\\\\\\Abdulmnoum\\\\\\\\\\\\\\\\Desktop\\\\\\\\\\\\\\\\programes\\\\\\\\\\\\\\\\Diplome_Project\\\\\\\\\\\\\\\\Team_Tasks.docx'\\); print\\('ZIP OK, files:', len\\(z.namelist\\(\\)\\)\\); z.close\\(\\)\")",
+      "Bash(python -c ':*)"
+    ]
+  }
+}

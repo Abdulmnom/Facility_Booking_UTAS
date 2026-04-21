@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npx react-scripts *)",
+      "Bash(sqlite3 /c/Users/Abdulmnoum/Desktop/programes/Diplome_Project/facility-booking-backend/bookings.db \"SELECT COUNT\\(*\\) as users FROM users; SELECT COUNT\\(*\\) as facilities FROM facilities; SELECT COUNT\\(*\\) as bookings FROM bookings;\")",
+      "Bash(sqlite3 /c/Users/Abdulmnoum/Desktop/programes/Diplome_Project/facility-booking-backend/bookings.db \"SELECT id, name, email, role, is_active FROM users;\")",
+      "Bash(sqlite3 /c/Users/Abdulmnoum/Desktop/programes/Diplome_Project/facility-booking-backend/bookings.db \"SELECT id, name, type, capacity, is_active FROM facilities;\")",
+      "Bash(sqlite3 /c/Users/Abdulmnoum/Desktop/programes/Diplome_Project/facility-booking-backend/bookings.db \"SELECT id, user_id, facility_id, booking_date, start_time, end_time, status FROM bookings;\")"
+    ]
+  }
+}
