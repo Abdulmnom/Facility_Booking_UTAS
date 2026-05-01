@@ -7,7 +7,7 @@ import useAuth from '../hooks/useAuth';
 
 export default function BookingsPage() {
   const { user } = useAuth();
-  const { bookings, loading, error, createBooking, updateBooking, deleteBooking } = useBookings();
+  const { bookings, loading, error, isOffline, pendingSync, createBooking, updateBooking, deleteBooking, syncPending } = useBookings();
   const [editBooking, setEditBooking] = useState(null);
   const [toast, setToast] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(null); // id to delete
@@ -18,22 +18,31 @@ export default function BookingsPage() {
   };
 
   const handleSubmit = async (form) => {
-    if (editBooking) {
-      await updateBooking(editBooking.id, form);
-      setEditBooking(null);
-      showToast('Booking updated successfully.');
-    } else {
-      await createBooking(form);
-      showToast('Booking created! Confirmation email sent.');
+    try {
+      if (editBooking) {
+        await updateBooking(editBooking.id, form);
+        setEditBooking(null);
+        showToast(isOffline ? 'Booking updated (saved locally).' : 'Booking updated successfully.');
+      } else {
+        await createBooking(form);
+        showToast(isOffline ? 'Booking created (saved locally).' : 'Booking created! Confirmation email sent.');
+      }
+    } catch (err) {
+      showToast(err.message);
     }
   };
 
   const handleDelete = (id) => setConfirmDelete(id);
 
   const confirmDeletion = async () => {
-    await deleteBooking(confirmDelete);
-    setConfirmDelete(null);
-    showToast('Booking cancelled.');
+    try {
+      await deleteBooking(confirmDelete);
+      setConfirmDelete(null);
+      showToast(isOffline ? 'Booking cancelled (saved locally).' : 'Booking cancelled.');
+    } catch (err) {
+      setConfirmDelete(null);
+      showToast(err.message);
+    }
   };
 
   return (
@@ -55,7 +64,26 @@ export default function BookingsPage() {
 
       <Container fluid="xl" style={{ marginTop: 28 }}>
         {toast && <div className="alert-dark-success mb-3">✓ {toast}</div>}
-        {error && <div className="alert-dark-error mb-3">{error}</div>}
+        
+        {/* Offline mode indicator */}
+        {isOffline && (
+          <div className="alert-dark-error mb-3" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span>
+              ⚠️ Offline mode: {pendingSync > 0 ? `${pendingSync} change(s) pending sync.` : 'Changes will be saved locally.'}
+            </span>
+            {pendingSync > 0 && navigator.onLine && (
+              <button 
+                onClick={syncPending} 
+                className="btn-teal btn" 
+                style={{ padding: '4px 12px', fontSize: '0.8rem' }}
+              >
+                Sync now
+              </button>
+            )}
+          </div>
+        )}
+        
+        {error && !isOffline && <div className="alert-dark-error mb-3">{error}</div>}
 
         {/* Two-column layout matching screenshot */}
         <Row className="g-4">

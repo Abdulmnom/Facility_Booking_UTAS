@@ -16,18 +16,18 @@ exports.getMyBookings = async (req, res) => {
 };
 
 exports.checkAvailability = async (req, res) => {
-  const { facilityId, date, start, end } = req.query;
-  if (!facilityId || !date || !start || !end) {
-    return res.status(400).json({ message: 'facilityId, date, start, end are required' });
+  const { facility_id, booking_date, start_time, end_time } = req.query;
+  if (!facility_id || !booking_date || !start_time || !end_time) {
+    return res.status(400).json({ message: 'facility_id, booking_date, start_time, end_time are required' });
   }
   try {
     const conflict = await Booking.findOne({
       where: {
-        facility_id: facilityId,
-        booking_date: date,
+        facility_id: facility_id,
+        booking_date: booking_date,
         status: { [Op.in]: ['pending', 'confirmed'] },
         [Op.or]: [
-          { start_time: { [Op.lt]: end }, end_time: { [Op.gt]: start } },
+          { start_time: { [Op.lt]: end_time }, end_time: { [Op.gt]: start_time } },
         ],
       },
     });
