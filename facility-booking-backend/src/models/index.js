@@ -20,7 +20,7 @@ const SEED_FACILITIES = [
 ];
 
 async function syncAndSeed() {
-  await sequelize.sync({ alter: true });
+  await sequelize.sync();
   for (const f of SEED_FACILITIES) {
     await Facility.findOrCreate({ where: { name: f.name }, defaults: f });
   }

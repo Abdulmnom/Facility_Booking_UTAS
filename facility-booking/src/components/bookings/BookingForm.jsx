@@ -58,10 +58,10 @@ export default function BookingForm({ editBooking, onSubmit, onCancel }) {
     try {
       // Check slot availability before submitting
       const params = new URLSearchParams({
-        facility_id: form.facility_id,
-        booking_date: form.booking_date,
-        start_time: form.start_time,
-        end_time: form.end_time,
+        facilityId: form.facility_id,
+        date: form.booking_date,
+        start: form.start_time,
+        end: form.end_time,
         ...(editBooking ? { exclude_id: editBooking.id } : {}),
       });
       const { data: avail } = await api.get(`/api/bookings/availability?${params}`);
