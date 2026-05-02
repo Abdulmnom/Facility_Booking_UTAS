@@ -3,6 +3,7 @@ import { Table, Spinner } from 'react-bootstrap';
 import api from '../../api/axios';
 
 const statusClass = { pending: 'badge-pending', confirmed: 'badge-confirmed', cancelled: 'badge-cancelled' };
+const statusLabel = { pending: 'pending', confirmed: 'accepted', cancelled: 'cancelled' };
 
 export default function AllBookings() {
   const [bookings, setBookings] = useState([]);
@@ -17,6 +18,18 @@ export default function AllBookings() {
       .finally(() => setLoading(false));
   };
   useEffect(() => { fetchAll(); }, []);
+
+  const handleApprove = async (id) => {
+    try {
+      await api.put(`/api/admin/bookings/${id}/approve`);
+      setMessage('Booking accepted.');
+      fetchAll();
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      setMessage(err.response?.data?.message || 'Failed to approve');
+      setTimeout(() => setMessage(''), 3000);
+    }
+  };
 
   const handleCancel = async (id) => {
     if (!window.confirm('Force-cancel this booking?')) return;
@@ -49,10 +62,18 @@ export default function AllBookings() {
                 </td>
                 <td>{b.facility?.name}</td>
                 <td>{b.booking_date}</td>
-                <td>{b.start_time}–{b.end_time}</td>
-                <td style={{ color: 'var(--clr-muted)' }}>{b.purpose || '—'}</td>
-                <td><span className={statusClass[b.status] || ''}>{b.status}</span></td>
-                <td>
+                <td style={{ whiteSpace: 'nowrap' }}>{b.start_time}–{b.end_time}</td>
+                <td style={{ color: 'var(--clr-muted)', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {b.purpose || <span style={{ opacity: 0.4 }}>—</span>}
+                </td>
+                <td><span className={statusClass[b.status] || ''}>{statusLabel[b.status] || b.status}</span></td>
+                <td style={{ whiteSpace: 'nowrap' }}>
+                  {b.status === 'pending' && (
+                    <button onClick={() => handleApprove(b.id)}
+                      style={{ background:'none',border:'none',cursor:'pointer',color:'#4ade80',fontWeight:600,fontSize:'.85rem',marginRight:8 }}>
+                      Accept
+                    </button>
+                  )}
                   {b.status !== 'cancelled' && (
                     <button onClick={() => handleCancel(b.id)}
                       style={{ background:'none',border:'none',cursor:'pointer',color:'#f87171',fontWeight:600,fontSize:'.85rem' }}>

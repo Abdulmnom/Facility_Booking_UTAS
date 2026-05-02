@@ -7,8 +7,8 @@ router.use(authMiddleware, adminMiddleware);
 
 router.get('/stats', adminController.getStats);
 router.get('/users', adminController.getUsers);
-router.put('/users/:id/role', adminController.updateUserRole);
 router.get('/bookings', adminController.getAllBookings);
+router.put('/bookings/:id/approve', adminController.approveBooking);
 router.delete('/bookings/:id', adminController.forceDeleteBooking);
 
 module.exports = router;

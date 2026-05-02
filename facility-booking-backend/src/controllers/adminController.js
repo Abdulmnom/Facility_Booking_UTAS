@@ -63,19 +63,15 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-exports.updateUserRole = async (req, res) => {
-  const { role } = req.body;
-  if (!['user', 'admin'].includes(role)) {
-    return res.status(400).json({ message: 'Role must be user or admin' });
-  }
+exports.approveBooking = async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    if (user.id === req.user.id) {
-      return res.status(400).json({ message: 'Cannot change your own role' });
+    const booking = await Booking.findByPk(req.params.id);
+    if (!booking) return res.status(404).json({ message: 'Booking not found' });
+    if (booking.status !== 'pending') {
+      return res.status(400).json({ message: 'Only pending bookings can be approved' });
     }
-    await user.update({ role });
-    return res.json({ id: user.id, name: user.name, email: user.email, role: user.role });
+    await booking.update({ status: 'confirmed' });
+    return res.json({ message: 'Booking approved', id: booking.id, status: booking.status });
   } catch (err) {
     return res.status(500).json({ message: 'Server error', error: err.message });
   }

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__e258f649-a3c0-4afe-8870-e073d07983f3__generate",
+      "mcp__e258f649-a3c0-4afe-8870-e073d07983f3__read_gamma"
+    ]
+  }
+}

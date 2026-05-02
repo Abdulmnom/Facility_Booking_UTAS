@@ -24,7 +24,17 @@ async function syncAndSeed() {
   for (const f of SEED_FACILITIES) {
     await Facility.findOrCreate({ where: { name: f.name }, defaults: f });
   }
-  console.log('Database synced. Facilities seeded.');
+  await User.findOrCreate({
+    where: { email: 'admin@facility.com' },
+    defaults: {
+      name: 'Admin',
+      email: 'admin@facility.com',
+      password_hash: 'Admin@1234',
+      role: 'admin',
+      is_active: true,
+    },
+  });
+  console.log('Database synced. Facilities seeded. Admin user ready.');
 }
 
 module.exports = { sequelize, User, Facility, Booking, syncAndSeed };
