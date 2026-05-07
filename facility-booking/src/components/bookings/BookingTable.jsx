@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, Spinner } from 'react-bootstrap';
 
 const statusClass = { pending: 'badge-pending', confirmed: 'badge-confirmed', cancelled: 'badge-cancelled' };
-const statusLabel = { pending: 'pending', confirmed: 'accepted', cancelled: 'cancelled' };
+const statusLabel = { pending: 'Pending', confirmed: 'Confirmed', cancelled: 'Cancelled' };
 
 export default function BookingTable({ bookings, onEdit, onDelete, loading }) {
   if (loading) {
@@ -19,7 +19,10 @@ export default function BookingTable({ bookings, onEdit, onDelete, loading }) {
   return (
     <div className="dark-card h-100 d-flex flex-column">
       <div className="card-header-label">
-        Booking Table {offlineCount > 0 && <span style={{ color: '#f5c518', fontSize: '0.7rem' }}>({offlineCount} offline)</span>}
+        Booking Table{' '}
+        {offlineCount > 0 && (
+          <span className="offline-chip">({offlineCount} offline)</span>
+        )}
       </div>
 
       <div className="table-responsive flex-grow-1">
@@ -44,7 +47,9 @@ export default function BookingTable({ bookings, onEdit, onDelete, loading }) {
                 <tr key={b.id}>
                   <td style={{ fontWeight: 600 }}>
                     {b.facility?.name || '—'}
-                    {b._offline && <span title="Saved locally" style={{ color: '#f5c518', marginLeft: 5 }}>💾</span>}
+                    {b._offline && (
+                      <span className="offline-icon" title="Saved locally — will sync when online">💾</span>
+                    )}
                   </td>
                   <td>{b.booking_date}</td>
                   <td style={{ whiteSpace: 'nowrap' }}>{b.start_time} – {b.end_time}</td>
@@ -52,18 +57,20 @@ export default function BookingTable({ bookings, onEdit, onDelete, loading }) {
                     {b.purpose || <span style={{ opacity: 0.4 }}>—</span>}
                   </td>
                   <td>
-                    <span className={statusClass[b.status] || ''}>{statusLabel[b.status] || b.status}</span>
+                    <span className={statusClass[b.status] || ''}>
+                      {statusLabel[b.status] || b.status}
+                    </span>
                   </td>
-                  <td>
+                  <td style={{ whiteSpace: 'nowrap' }}>
                     <button
+                      className="btn-tbl-icon btn-tbl-teal"
                       onClick={() => onEdit(b)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--clr-teal)', fontSize: '1.1rem', marginRight: 10 }}
-                      title="Edit"
+                      title="Edit booking"
                     >✎</button>
                     <button
+                      className="btn-tbl-icon btn-tbl-red"
                       onClick={() => onDelete(b.id)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#f87171', fontSize: '1.1rem' }}
-                      title="Cancel"
+                      title="Cancel booking"
                     >✕</button>
                   </td>
                 </tr>
@@ -73,7 +80,6 @@ export default function BookingTable({ bookings, onEdit, onDelete, loading }) {
         )}
       </div>
 
-      {/* Footer bar — matches screenshot */}
       <div className="table-footer-bar">
         Total Bookings: {active.length}
       </div>

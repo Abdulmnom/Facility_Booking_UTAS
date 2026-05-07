@@ -18,27 +18,26 @@ export default function AdminDashboard() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-page)', paddingBottom: 40 }}>
+
       {/* Page header */}
-      <div style={{ background: 'var(--bg-card)', borderBottom: '1px solid rgba(0,196,167,.18)', padding: '24px 0 20px' }}>
+      <div className="page-header">
         <Container fluid="xl">
-          <span style={{ color: 'var(--clr-teal)', textTransform: 'uppercase', letterSpacing: '.14em', fontSize: '.72rem', fontWeight: 700 }}>
-            Admin Panel
-          </span>
-          <h1 style={{ color: '#fff', fontWeight: 800, fontSize: '2rem', marginTop: 6, marginBottom: 0 }}>
-            Admin Dashboard
-          </h1>
+          <span className="page-header-eyebrow">Admin Panel</span>
+          <h1 className="page-header-title">Admin Dashboard</h1>
         </Container>
       </div>
 
       <Container fluid="xl" style={{ marginTop: 28 }}>
-        {/* Tabs */}
+        {/* Tabs — .tab-btn is now defined in index.css, works alongside .nav-link */}
         <Nav variant="tabs" className="dark-tabs">
           {TABS.map((t) => (
             <Nav.Item key={t}>
               <Nav.Link
-                className={`tab-btn ${activeTab === t ? 'active' : ''}`}
+                className={`tab-btn${activeTab === t ? ' active' : ''}`}
                 onClick={() => setActiveTab(t)}
-              >{t}</Nav.Link>
+              >
+                {t}
+              </Nav.Link>
             </Nav.Item>
           ))}
         </Nav>

@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Spinner } from 'react-bootstrap';
 import api from '../../api/axios';
-import useAuth from '../../hooks/useAuth';
-
 export default function UserList() {
-  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 

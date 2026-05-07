@@ -8,7 +8,14 @@
       "Bash(python scripts/office/validate.py \"C:\\\\Users\\\\user\\\\Desktop\\\\UTAS\\\\Secounyear_sem_2\\\\Dipolum_poject\\\\University_Facility_Booking_Report_v2.docx\")",
       "Bash(pip install *)",
       "Bash(python -c ' *)",
-      "Bash(python generate_diagrams.py)"
+      "Bash(python generate_diagrams.py)",
+      "Bash(npm install *)",
+      "Bash(npm test *)",
+      "Bash(npm run *)",
+      "Bash(Select-String -Path \"C:\\\\Users\\\\user\\\\Documents\\\\GitHub\\\\Facility_Booking_UTAS\\\\facility-booking\\\\build\\\\service-worker.js\" -Pattern \"WB_MANIFEST|ufbs-static|ufbs-api|NetworkFirst\")",
+      "Bash(Select-Object -First 10)",
+      "Bash(node -e \"const fs=require\\('fs'\\); const sw=fs.readFileSync\\('C:/Users/user/Documents/GitHub/Facility_Booking_UTAS/facility-booking/build/service-worker.js','utf8'\\); ['ufbs-static-v1','ufbs-api-v1','ufbs-images-v1','NetworkFirst','CacheFirst','StaleWhileRevalidate'].forEach\\(k=>console.log\\(k+':', sw.includes\\(k\\)\\)\\)\")",
+      "Bash(node -e ' *)"
     ]
   }
 }

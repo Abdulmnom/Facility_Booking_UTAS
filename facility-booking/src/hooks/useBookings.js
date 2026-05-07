@@ -4,7 +4,6 @@ import api from '../api/axios';
 const STORAGE_KEY = 'fbk_bookings';
 const STORAGE_PENDING_KEY = 'fbk_pending_sync';
 
-// Load bookings from localStorage
 function loadFromStorage() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -14,16 +13,14 @@ function loadFromStorage() {
   }
 }
 
-// Save bookings to localStorage
 function saveToStorage(bookings) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
   } catch {
-    // Ignore storage errors (e.g., quota exceeded)
+    // Ignore quota errors
   }
 }
 
-// Load pending operations (for offline sync)
 function loadPendingOps() {
   try {
     const stored = localStorage.getItem(STORAGE_PENDING_KEY);
@@ -33,16 +30,14 @@ function loadPendingOps() {
   }
 }
 
-// Save pending operations
 function savePendingOps(ops) {
   try {
     localStorage.setItem(STORAGE_PENDING_KEY, JSON.stringify(ops));
   } catch {
-    // Ignore storage errors
+    // Ignore quota errors
   }
 }
 
-// Generate temporary ID for offline bookings
 function generateTempId() {
   return 'temp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 }
@@ -54,7 +49,6 @@ export default function useBookings() {
   const [isOffline, setIsOffline] = useState(false);
   const [pendingSync, setPendingSync] = useState(() => loadPendingOps().length);
 
-  // Fetch bookings from API (with localStorage fallback)
   const fetchBookings = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -64,7 +58,6 @@ export default function useBookings() {
       saveToStorage(res.data);
       setIsOffline(false);
     } catch (err) {
-      // Fallback to localStorage on API failure
       const cached = loadFromStorage();
       if (cached.length > 0) {
         setBookings(cached);
@@ -78,112 +71,125 @@ export default function useBookings() {
     }
   }, []);
 
-  // Initial load
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
 
-  // Persist to localStorage whenever bookings change
   useEffect(() => {
     saveToStorage(bookings);
   }, [bookings]);
 
-  // Create booking (works offline)
   const createBooking = useCallback(async (data) => {
+    // Strip the _facilityName helper field before sending to the API
+    const { _facilityName, ...apiData } = data;
+
     try {
-      const res = await api.post('/api/bookings', data);
+      const res = await api.post('/api/bookings', apiData);
       setBookings((prev) => [res.data, ...prev]);
       setIsOffline(false);
       return res.data;
     } catch (err) {
-      // Offline mode: create local booking
+      // Only go offline when it's a real network/server failure, not a 4xx validation error
+      const status = err.response?.status;
+      if (status && status < 500) {
+        // Propagate validation / conflict errors to the form — don't queue them
+        throw err;
+      }
+
+      // Network error or 5xx — create local copy and queue for sync
       const tempBooking = {
         id: generateTempId(),
-        ...data,
+        ...apiData,
         status: 'pending',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        facility: { name: 'Unknown (offline)' }, // Will be resolved on sync
+        // Use the facility name passed from the form so the table shows the right name
+        facility: { name: _facilityName || 'Unknown (offline)' },
         _offline: true,
       };
-      
+
       setBookings((prev) => [tempBooking, ...prev]);
-      
-      // Queue for sync
+
+      // Queue for sync — facility_id is already an integer (coerced in BookingForm)
       const pending = loadPendingOps();
-      pending.push({ type: 'create', data });
+      pending.push({ type: 'create', data: { ...apiData, facility_id: parseInt(apiData.facility_id, 10) } });
       savePendingOps(pending);
       setPendingSync(pending.length);
       setIsOffline(true);
-      
+
       return tempBooking;
     }
   }, []);
 
-  // Update booking (works offline)
   const updateBooking = useCallback(async (id, data) => {
+    const { _facilityName, ...apiData } = data;
+
     try {
-      const res = await api.put(`/api/bookings/${id}`, data);
+      const res = await api.put(`/api/bookings/${id}`, apiData);
       setBookings((prev) => prev.map((b) => (b.id === id ? res.data : b)));
       setIsOffline(false);
       return res.data;
     } catch (err) {
-      // Offline mode: update locally
+      const status = err.response?.status;
+      if (status && status < 500) throw err;
+
       setBookings((prev) =>
         prev.map((b) =>
           b.id === id
-            ? { ...b, ...data, updatedAt: new Date().toISOString(), _offline: true }
+            ? { ...b, ...apiData, updatedAt: new Date().toISOString(), _offline: true }
             : b
         )
       );
-      
-      // Queue for sync (only if not a temp booking)
+
       if (!String(id).startsWith('temp_')) {
         const pending = loadPendingOps();
-        pending.push({ type: 'update', id, data });
+        pending.push({
+          type: 'update',
+          id,
+          data: { ...apiData, ...(apiData.facility_id ? { facility_id: parseInt(apiData.facility_id, 10) } : {}) },
+        });
         savePendingOps(pending);
         setPendingSync(pending.length);
       }
-      
+
       setIsOffline(true);
       throw new Error('Changes saved locally. Will sync when online.');
     }
   }, []);
 
-  // Delete/Cancel booking (works offline)
   const deleteBooking = useCallback(async (id) => {
     try {
       await api.delete(`/api/bookings/${id}`);
       setBookings((prev) => prev.filter((b) => b.id !== id));
       setIsOffline(false);
     } catch (err) {
-      // Offline mode: mark as cancelled locally
+      const status = err.response?.status;
+      if (status && status < 500) throw err;
+
       setBookings((prev) =>
         prev.map((b) =>
           b.id === id ? { ...b, status: 'cancelled', _offline: true } : b
         )
       );
-      
-      // Queue for sync (only if not a temp booking)
+
       if (!String(id).startsWith('temp_')) {
         const pending = loadPendingOps();
         pending.push({ type: 'delete', id });
         savePendingOps(pending);
         setPendingSync(pending.length);
       }
-      
+
       setIsOffline(true);
       throw new Error('Cancellation saved locally. Will sync when online.');
     }
   }, []);
 
-  // Sync pending operations when coming back online
   const syncPending = useCallback(async () => {
     const pending = loadPendingOps();
     if (pending.length === 0) return;
 
     const failedOps = [];
-    
+
     for (const op of pending) {
       try {
         switch (op.type) {
@@ -196,30 +202,34 @@ export default function useBookings() {
           case 'delete':
             await api.delete(`/api/bookings/${op.id}`);
             break;
+          default:
+            break;
         }
-      } catch {
-        failedOps.push(op);
+      } catch (err) {
+        const status = err.response?.status;
+        // 4xx errors (409 conflict, 404 not found, 400 validation) are permanent failures —
+        // discard them instead of retrying forever. Only keep network/5xx errors for retry.
+        if (!status || status >= 500) {
+          failedOps.push(op);
+        }
+        // 4xx: silently drop — the operation is no longer valid
       }
     }
 
     savePendingOps(failedOps);
     setPendingSync(failedOps.length);
-    
-    // Refresh bookings after sync
+
     if (failedOps.length === 0) {
       await fetchBookings();
       setIsOffline(false);
     }
   }, [fetchBookings]);
 
-  // Auto-sync when coming back online
+  // Auto-sync when the browser comes back online
   useEffect(() => {
     const handleOnline = () => {
-      if (pendingSync > 0) {
-        syncPending();
-      }
+      if (pendingSync > 0) syncPending();
     };
-
     window.addEventListener('online', handleOnline);
     return () => window.removeEventListener('online', handleOnline);
   }, [pendingSync, syncPending]);

@@ -87,14 +87,12 @@ export default function FacilityManager() {
                   <td style={{ fontWeight: 600 }}>{f.name}</td>
                   <td style={{ textTransform: 'capitalize', color: 'var(--clr-muted)' }}>{f.type}</td>
                   <td>{f.capacity}</td>
-                  <td>
-                    <button onClick={() => handleEdit(f)}
-                      style={{ background:'none',border:'none',cursor:'pointer',color:'var(--clr-teal)',fontWeight:600,fontSize:'.85rem',marginRight:14 }}>
-                      Edit
+                  <td style={{ whiteSpace: 'nowrap' }}>
+                    <button className="btn-tbl btn-tbl-teal" style={{ marginRight: 12 }} onClick={() => handleEdit(f)}>
+                      ✎ Edit
                     </button>
-                    <button onClick={() => handleDeactivate(f.id)}
-                      style={{ background:'none',border:'none',cursor:'pointer',color:'#f87171',fontWeight:600,fontSize:'.85rem' }}>
-                      Deactivate
+                    <button className="btn-tbl btn-tbl-red" onClick={() => handleDeactivate(f.id)}>
+                      ✕ Deactivate
                     </button>
                   </td>
                 </tr>

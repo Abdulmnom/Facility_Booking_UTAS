@@ -10,25 +10,22 @@ export default function BookingsPage() {
   const { bookings, loading, error, isOffline, pendingSync, createBooking, updateBooking, deleteBooking, syncPending } = useBookings();
   const [editBooking, setEditBooking] = useState(null);
   const [toast, setToast] = useState('');
-  const [confirmDelete, setConfirmDelete] = useState(null); // id to delete
+  const [toastType, setToastType] = useState('success');
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
-  const showToast = (msg) => {
-    setToast(msg);
+  const showToast = (msg, type = 'success') => {
+    setToast(msg); setToastType(type);
     setTimeout(() => setToast(''), 4000);
   };
 
   const handleSubmit = async (form) => {
-    try {
-      if (editBooking) {
-        await updateBooking(editBooking.id, form);
-        setEditBooking(null);
-        showToast(isOffline ? 'Booking updated (saved locally).' : 'Booking updated successfully.');
-      } else {
-        await createBooking(form);
-        showToast(isOffline ? 'Booking created (saved locally).' : 'Booking created! Confirmation email sent.');
-      }
-    } catch (err) {
-      showToast(err.message);
+    if (editBooking) {
+      await updateBooking(editBooking.id, form);
+      setEditBooking(null);
+      showToast(isOffline ? 'Booking updated (saved locally).' : 'Booking updated successfully.');
+    } else {
+      await createBooking(form);
+      showToast(isOffline ? 'Booking saved locally — will sync when online.' : 'Booking created! Confirmation email sent.');
     }
   };
 
@@ -47,45 +44,47 @@ export default function BookingsPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-page)', padding: '0 0 40px' }}>
+
       {/* Page header */}
-      <div style={{ background: 'var(--bg-card)', borderBottom: '1px solid rgba(0,196,167,.18)', padding: '24px 0 20px' }}>
+      <div className="page-header">
         <Container fluid="xl">
-          <span style={{ color: 'var(--clr-teal)', textTransform: 'uppercase', letterSpacing: '.14em', fontSize: '.72rem', fontWeight: 700 }}>
-            Sample Screens
-          </span>
-          <h1 style={{ color: '#fff', fontWeight: 800, fontSize: '2rem', marginTop: 6, marginBottom: 4 }}>
-            Project Visuals — Booking Form &amp; Table
-          </h1>
-          <p style={{ color: 'var(--clr-muted)', fontSize: '.88rem', margin: 0 }}>
-            Welcome, <strong style={{ color: '#fff' }}>{user?.name}</strong>. Book a facility using the form below.
+          <span className="page-header-eyebrow">My Bookings</span>
+          <h1 className="page-header-title">Booking Form &amp; Table</h1>
+          <p className="page-header-sub">
+            Welcome, <strong style={{ color: '#11cc4f' }}>{user?.name}</strong>. Book a facility using the form below.
           </p>
         </Container>
       </div>
 
       <Container fluid="xl" style={{ marginTop: 28 }}>
-        {toast && <div className="alert-dark-success mb-3">✓ {toast}</div>}
-        
-        {/* Offline mode indicator */}
+
+        {/* Toast notifications */}
+        {toast && (
+          <div className={`mb-3 ${toastType === 'error' ? 'alert-dark-error' : 'alert-dark-success'}`}>
+            {toastType === 'success' ? '✓ ' : '⚠ '}{toast}
+          </div>
+        )}
+
+        {/* Offline banner — yellow, distinct from error red */}
         {isOffline && (
-          <div className="alert-dark-error mb-3" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="offline-banner">
             <span>
-              ⚠️ Offline mode: {pendingSync > 0 ? `${pendingSync} change(s) pending sync.` : 'Changes will be saved locally.'}
+              ⚠️ Offline mode
+              {pendingSync > 0
+                ? ` — ${pendingSync} change${pendingSync > 1 ? 's' : ''} pending sync.`
+                : ' — Changes will sync automatically when connection is restored.'}
             </span>
             {pendingSync > 0 && navigator.onLine && (
-              <button 
-                onClick={syncPending} 
-                className="btn-teal btn" 
-                style={{ padding: '4px 12px', fontSize: '0.8rem' }}
-              >
+              <button className="btn-teal btn" style={{ padding: '4px 14px', fontSize: '.8rem', flexShrink: 0 }} onClick={syncPending}>
                 Sync now
               </button>
             )}
           </div>
         )}
-        
+
         {error && !isOffline && <div className="alert-dark-error mb-3">{error}</div>}
 
-        {/* Two-column layout matching screenshot */}
+        {/* Two-column layout */}
         <Row className="g-4">
           <Col xs={12} lg={5}>
             <BookingForm
@@ -105,17 +104,21 @@ export default function BookingsPage() {
         </Row>
       </Container>
 
-      {/* Delete confirmation modal */}
+      {/* Delete confirmation modal — dark theme applied via CSS (.modal-content override) */}
       <Modal show={!!confirmDelete} onHide={() => setConfirmDelete(null)} centered>
-        <Modal.Header style={{ background: 'var(--bg-card)', borderBottom: '1px solid rgba(0,196,167,.18)' }}>
-          <Modal.Title style={{ color: '#fff', fontSize: '1rem', fontWeight: 700 }}>Cancel Booking</Modal.Title>
+        <Modal.Header closeButton>
+          <Modal.Title>Cancel Booking</Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ background: 'var(--bg-card)', color: 'var(--clr-muted)' }}>
-          Are you sure you want to cancel this booking? This cannot be undone.
+        <Modal.Body>
+          Are you sure you want to cancel this booking? This action cannot be undone.
         </Modal.Body>
-        <Modal.Footer style={{ background: 'var(--bg-card)', borderTop: '1px solid rgba(0,196,167,.18)' }}>
-          <Button variant="secondary" onClick={() => setConfirmDelete(null)}>Keep it</Button>
-          <Button className="btn-teal btn" onClick={confirmDeletion}>Yes, cancel booking</Button>
+        <Modal.Footer>
+          <Button variant="secondary" className="btn-outline-muted btn" onClick={() => setConfirmDelete(null)}>
+            Keep it
+          </Button>
+          <Button className="btn-teal btn" onClick={confirmDeletion}>
+            Yes, cancel booking
+          </Button>
         </Modal.Footer>
       </Modal>
     </div>

@@ -3,12 +3,13 @@ import { Table, Spinner } from 'react-bootstrap';
 import api from '../../api/axios';
 
 const statusClass = { pending: 'badge-pending', confirmed: 'badge-confirmed', cancelled: 'badge-cancelled' };
-const statusLabel = { pending: 'pending', confirmed: 'accepted', cancelled: 'cancelled' };
+const statusLabel = { pending: 'Pending', confirmed: 'Confirmed', cancelled: 'Cancelled' };
 
 export default function AllBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const [msgType, setMsgType] = useState('success');
 
   const fetchAll = () => {
     setLoading(true);
@@ -19,65 +20,96 @@ export default function AllBookings() {
   };
   useEffect(() => { fetchAll(); }, []);
 
+  const flash = (msg, type = 'success') => {
+    setMessage(msg); setMsgType(type);
+    setTimeout(() => setMessage(''), 3000);
+  };
+
   const handleApprove = async (id) => {
     try {
       await api.put(`/api/admin/bookings/${id}/approve`);
-      setMessage('Booking accepted.');
+      flash('Booking confirmed.');
       fetchAll();
-      setTimeout(() => setMessage(''), 3000);
     } catch (err) {
-      setMessage(err.response?.data?.message || 'Failed to approve');
-      setTimeout(() => setMessage(''), 3000);
+      flash(err.response?.data?.message || 'Failed to approve', 'error');
     }
   };
 
   const handleCancel = async (id) => {
     if (!window.confirm('Force-cancel this booking?')) return;
-    await api.delete(`/api/admin/bookings/${id}`);
-    setMessage('Booking cancelled.'); fetchAll();
-    setTimeout(() => setMessage(''), 3000);
+    try {
+      await api.delete(`/api/admin/bookings/${id}`);
+      flash('Booking cancelled.');
+      fetchAll();
+    } catch (err) {
+      flash(err.response?.data?.message || 'Failed to cancel', 'error');
+    }
   };
 
-  if (loading) return <div className="d-flex justify-content-center pt-5"><Spinner animation="border" style={{ color: 'var(--clr-teal)' }} /></div>;
+  if (loading) return (
+    <div className="d-flex justify-content-center pt-5">
+      <Spinner animation="border" style={{ color: 'var(--clr-teal)' }} />
+    </div>
+  );
 
   const active = bookings.filter((b) => b.status !== 'cancelled');
 
   return (
     <div className="dark-card">
       <div className="card-header-label">All Bookings</div>
-      {message && <div className="alert-dark-success mx-3 mt-3">{message}</div>}
+
+      {message && (
+        <div className={`mx-3 mt-3 ${msgType === 'error' ? 'alert-dark-error' : 'alert-dark-success'}`}>
+          {message}
+        </div>
+      )}
+
       <div className="table-responsive">
         <Table className="dark-table mb-0">
           <thead>
             <tr>
-              <th>User</th><th>Facility</th><th>Date</th><th>Time</th><th>Purpose</th><th>Status</th><th>Actions</th>
+              <th>User</th>
+              <th>Facility</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Purpose</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {bookings.map((b) => (
+            {bookings.length === 0 ? (
+              <tr>
+                <td colSpan={7} style={{ textAlign: 'center', color: 'var(--clr-muted)', padding: 32 }}>
+                  No bookings found.
+                </td>
+              </tr>
+            ) : bookings.map((b) => (
               <tr key={b.id}>
                 <td>
-                  <div style={{ fontWeight: 600 }}>{b.user?.name}</div>
+                  <div style={{ fontWeight: 600 }}>{b.user?.name || '—'}</div>
                   <div style={{ color: 'var(--clr-muted)', fontSize: '.78rem' }}>{b.user?.email}</div>
                 </td>
-                <td>{b.facility?.name}</td>
+                <td>{b.facility?.name || '—'}</td>
                 <td>{b.booking_date}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>{b.start_time}–{b.end_time}</td>
                 <td style={{ color: 'var(--clr-muted)', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {b.purpose || <span style={{ opacity: 0.4 }}>—</span>}
                 </td>
-                <td><span className={statusClass[b.status] || ''}>{statusLabel[b.status] || b.status}</span></td>
+                <td>
+                  <span className={statusClass[b.status] || ''}>
+                    {statusLabel[b.status] || b.status}
+                  </span>
+                </td>
                 <td style={{ whiteSpace: 'nowrap' }}>
                   {b.status === 'pending' && (
-                    <button onClick={() => handleApprove(b.id)}
-                      style={{ background:'none',border:'none',cursor:'pointer',color:'#4ade80',fontWeight:600,fontSize:'.85rem',marginRight:8 }}>
-                      Accept
+                    <button className="btn-tbl btn-tbl-green" onClick={() => handleApprove(b.id)}>
+                      ✓ Approve
                     </button>
                   )}
                   {b.status !== 'cancelled' && (
-                    <button onClick={() => handleCancel(b.id)}
-                      style={{ background:'none',border:'none',cursor:'pointer',color:'#f87171',fontWeight:600,fontSize:'.85rem' }}>
-                      Cancel
+                    <button className="btn-tbl btn-tbl-red" style={{ marginLeft: b.status === 'pending' ? 8 : 0 }} onClick={() => handleCancel(b.id)}>
+                      ✕ Cancel
                     </button>
                   )}
                 </td>
@@ -86,6 +118,7 @@ export default function AllBookings() {
           </tbody>
         </Table>
       </div>
+
       <div className="table-footer-bar">Total Active: {active.length}</div>
     </div>
   );

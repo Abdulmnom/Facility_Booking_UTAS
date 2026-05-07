@@ -49,11 +49,28 @@ exports.checkAvailability = async (req, res) => {
 };
 
 exports.createBooking = async (req, res) => {
-  const { facility_id, booking_date, start_time, end_time, purpose } = req.body;
+  // express-validator's .toInt() already coerces facility_id; parseInt is defense-in-depth
+  const facility_id = parseInt(req.body.facility_id, 10);
+  const { booking_date, start_time, end_time, purpose } = req.body;
+
   if (!facility_id || !booking_date || !start_time || !end_time) {
     return res.status(400).json({ message: 'facility_id, booking_date, start_time, end_time are required' });
   }
+
+  // Validate end_time is after start_time
+  const [sh, sm] = start_time.split(':').map(Number);
+  const [eh, em] = end_time.split(':').map(Number);
+  if (sh * 60 + sm >= eh * 60 + em) {
+    return res.status(400).json({ message: 'end_time must be after start_time' });
+  }
+
   try {
+    // Verify facility exists and is active — SQLite does not enforce FKs by default
+    const facility = await Facility.findOne({ where: { id: facility_id, is_active: true } });
+    if (!facility) {
+      return res.status(404).json({ message: 'Facility not found or is no longer active' });
+    }
+
     // Conflict detection
     const conflict = await Booking.findOne({
       where: {
@@ -82,7 +99,7 @@ exports.createBooking = async (req, res) => {
       include: [{ model: Facility, as: 'facility' }],
     });
 
-    // Send email (non-blocking)
+    // Send email (non-blocking — must never affect the 201 response)
     try {
       const user = await User.findByPk(req.user.id);
       await sendBookingConfirmation(user, fullBooking, fullBooking.facility);
@@ -93,7 +110,20 @@ exports.createBooking = async (req, res) => {
 
     return res.status(201).json(fullBooking);
   } catch (err) {
-    return res.status(500).json({ message: 'Server error', error: err.message });
+    if (err.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        message: 'Validation error',
+        errors: err.errors.map((e) => ({ field: e.path, message: e.message })),
+      });
+    }
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).json({ message: 'This time slot was just booked by someone else. Please try again.' });
+    }
+    if (err.name === 'SequelizeForeignKeyConstraintError') {
+      return res.status(400).json({ message: 'Facility does not exist' });
+    }
+    console.error('createBooking error:', err);
+    return res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -134,7 +164,17 @@ exports.updateBooking = async (req, res) => {
     const updated = await Booking.findByPk(booking.id, { include: [{ model: Facility, as: 'facility' }] });
     return res.json(updated);
   } catch (err) {
-    return res.status(500).json({ message: 'Server error', error: err.message });
+    if (err.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        message: 'Validation error',
+        errors: err.errors.map((e) => ({ field: e.path, message: e.message })),
+      });
+    }
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).json({ message: 'This time slot was just booked by someone else. Please try again.' });
+    }
+    console.error('updateBooking error:', err);
+    return res.status(500).json({ message: 'Server error' });
   }
 };
 

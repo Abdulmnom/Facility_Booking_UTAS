@@ -70,10 +70,19 @@ export default function BookingForm({ editBooking, onSubmit, onCancel }) {
         setLoading(false);
         return;
       }
-      await onSubmit(form);
+      // Coerce facility_id to integer — <select> values are always strings.
+      // Pass _facilityName so the offline temp booking can show the real name.
+      const selectedFacility = facilities.find((f) => String(f.id) === String(form.facility_id));
+      await onSubmit({
+        ...form,
+        facility_id: parseInt(form.facility_id, 10),
+        _facilityName: selectedFacility?.name,
+      });
       if (!editBooking) setForm({ facility_id: '', booking_date: '', start_time: '', end_time: '', purpose: '' });
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to save booking.');
+      const data = err.response?.data;
+      const fieldError = data?.errors?.[0]?.msg || data?.errors?.[0]?.message;
+      setError(fieldError || data?.message || err.message || 'Failed to save booking.');
     } finally {
       setLoading(false);
     }

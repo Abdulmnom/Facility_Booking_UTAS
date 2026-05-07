@@ -13,6 +13,9 @@
   --clr-teal-glow: rgba(0,196,167,.18);
   --clr-muted:     #7ea8c4;
   --border-teal:   1px solid #00c4a7;
+  --clr-offline:   #f5c518;
+  --clr-green:     #4ade80;
+  --clr-red:       #f87171;
 }
 
 body {
@@ -127,6 +130,21 @@ body {
 .alert-dark-error   { background:#2d0a0a; border:1px solid #f87171; color:#fca5a5; border-radius:7px; padding:10px 14px; font-size:.85rem; }
 .alert-dark-success { background:#002d1e; border:1px solid #00c4a7; color:#6ee7b7; border-radius:7px; padding:10px 14px; font-size:.85rem; }
 
+/* Offline warning banner (yellow — distinct from error red) */
+.offline-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #2d2200;
+  border: 1px solid var(--clr-offline);
+  color: #fde68a;
+  border-radius: 7px;
+  padding: 10px 14px;
+  font-size: .85rem;
+  margin-bottom: 1rem;
+}
+
 /* ─── Stat Cards ─────────────────────────────────────── */
 .stat-card {
   background: var(--bg-card);
@@ -137,8 +155,80 @@ body {
 .stat-label { font-size:.72rem; color:var(--clr-muted); letter-spacing:.1em; text-transform:uppercase; }
 .stat-value { font-size:2.4rem; font-weight:800; color:var(--clr-teal); margin-top:4px; }
 
+/* ─── Page Header (reusable across Bookings, Admin, Calendar) ─── */
+.page-header {
+  background: var(--bg-card);
+  border-bottom: 1px solid rgba(0,196,167,.18);
+  padding: 24px 0 20px;
+}
+.page-header-eyebrow {
+  color: var(--clr-teal);
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: .72rem;
+  font-weight: 700;
+  display: block;
+}
+.page-header-title {
+  color: #fff;
+  font-weight: 800;
+  font-size: 2rem;
+  margin-top: 6px;
+  margin-bottom: 0;
+  line-height: 1.2;
+}
+.page-header-sub {
+  color: var(--clr-muted);
+  font-size: .88rem;
+  margin: 4px 0 0;
+}
+
+/* ─── Table Action Buttons ───────────────────────────── */
+/* Shared base — removes all browser default button chrome */
+.btn-tbl {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .85rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: opacity .15s, color .15s;
+  line-height: 1;
+}
+.btn-tbl:hover { opacity: .75; }
+
+/* Icon-sized variant used in BookingTable (edit ✎ / delete ✕) */
+.btn-tbl-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: opacity .15s;
+  line-height: 1;
+}
+.btn-tbl-icon:hover { opacity: .7; }
+
+.btn-tbl-teal  { color: var(--clr-teal); }
+.btn-tbl-green { color: var(--clr-green); }
+.btn-tbl-red   { color: var(--clr-red);   }
+
+/* Offline indicator inside table cells / headers */
+.offline-chip {
+  color: var(--clr-offline);
+  font-size: .7rem;
+}
+.offline-icon {
+  color: var(--clr-offline);
+  margin-left: 5px;
+}
+
 /* ─── Nav Tabs (Admin) ───────────────────────────────── */
-.dark-tabs .nav-link {
+/* Works for both Bootstrap Nav.Link and plain <button class="tab-btn"> */
+.dark-tabs .nav-link,
+.dark-tabs .tab-btn {
   color: var(--clr-muted) !important;
   border: none !important;
   border-bottom: 2px solid transparent !important;
@@ -146,13 +236,44 @@ body {
   font-weight: 600;
   border-radius: 0 !important;
   padding: 10px 20px;
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
 }
-.dark-tabs .nav-link.active {
+.dark-tabs .nav-link:hover,
+.dark-tabs .tab-btn:hover {
+  color: #fff !important;
+}
+.dark-tabs .nav-link.active,
+.dark-tabs .tab-btn.active {
   color: var(--clr-teal) !important;
   border-bottom: 2px solid var(--clr-teal) !important;
   background: none !important;
 }
 .dark-tabs { border-bottom: 1.5px solid rgba(0,196,167,.25) !important; margin-bottom: 24px; }
+
+/* ─── Bootstrap Modal dark theme override ────────────── */
+.modal-content {
+  background: var(--bg-card) !important;
+  border: 1px solid rgba(0,196,167,.25) !important;
+  color: #fff !important;
+}
+.modal-header {
+  background: var(--bg-card) !important;
+  border-bottom: 1px solid rgba(0,196,167,.18) !important;
+}
+.modal-body {
+  background: var(--bg-card) !important;
+  color: var(--clr-muted) !important;
+}
+.modal-footer {
+  background: var(--bg-card) !important;
+  border-top: 1px solid rgba(0,196,167,.18) !important;
+}
+.modal-title {
+  color: #fff !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+}
 
 /* ─── FullCalendar dark overrides ────────────────────── */
 .fc { color: #fff; }
