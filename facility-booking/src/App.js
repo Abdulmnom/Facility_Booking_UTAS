@@ -22,6 +22,7 @@ export default function App() {
             <Route path="/" element={<Navigate to="/bookings" replace />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/not-found" element={<h1>Page Not Found</h1>} />
             <Route path="/bookings" element={
               <ProtectedRoute><BookingsPage /></ProtectedRoute>
             } />

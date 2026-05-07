@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Frontend (React)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start", "--prefix", "facility-booking"],
+      "port": 3000
+    },
+    {
+      "name": "Backend (Express dev)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "facility-booking-backend"],
+      "port": 5000
+    }
+  ]
+}

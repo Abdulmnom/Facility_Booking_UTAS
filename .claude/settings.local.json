@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "mcp__e258f649-a3c0-4afe-8870-e073d07983f3__generate",
-      "mcp__e258f649-a3c0-4afe-8870-e073d07983f3__read_gamma"
+      "mcp__e258f649-a3c0-4afe-8870-e073d07983f3__read_gamma",
+      "Read(//c/Users/user/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/bc35eb1e-7b53-4a90-8864-2dec003e2d19/868cc9e1-4eb5-48d0-bc69-c311d4de9bc2/skills/docx/**)",
+      "Bash(node generate_report.js)",
+      "Bash(python scripts/office/validate.py \"C:\\\\Users\\\\user\\\\Desktop\\\\UTAS\\\\Secounyear_sem_2\\\\Dipolum_poject\\\\University_Facility_Booking_Report_v2.docx\")",
+      "Bash(pip install *)",
+      "Bash(python -c ' *)",
+      "Bash(python generate_diagrams.py)"
     ]
   }
 }
