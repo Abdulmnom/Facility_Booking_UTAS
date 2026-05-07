@@ -18,7 +18,9 @@ const Booking = sequelize.define('Booking', {
     {
       unique: true,
       fields: ['facility_id', 'booking_date', 'start_time'],
-      where: { status: ['pending', 'confirmed'] },
+      // Partial-index WHERE clause removed: plain-array syntax is invalid in
+      // Sequelize+SQLite and causes silent sync errors. Application-level
+      // conflict detection in bookingController already enforces this logic.
     },
   ],
 });

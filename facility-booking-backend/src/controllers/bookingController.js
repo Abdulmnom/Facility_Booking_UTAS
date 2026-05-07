@@ -16,21 +16,32 @@ exports.getMyBookings = async (req, res) => {
 };
 
 exports.checkAvailability = async (req, res) => {
-  const { facility_id, booking_date, start_time, end_time } = req.query;
+  // Accept both camelCase (frontend) and snake_case (direct API callers)
+  const facility_id  = req.query.facility_id  ?? req.query.facilityId;
+  const booking_date = req.query.booking_date ?? req.query.date;
+  const start_time   = req.query.start_time   ?? req.query.start;
+  const end_time     = req.query.end_time     ?? req.query.end;
+  const exclude_id   = req.query.exclude_id   ?? null;
+
   if (!facility_id || !booking_date || !start_time || !end_time) {
     return res.status(400).json({ message: 'facility_id, booking_date, start_time, end_time are required' });
   }
   try {
-    const conflict = await Booking.findOne({
-      where: {
-        facility_id: facility_id,
-        booking_date: booking_date,
-        status: { [Op.in]: ['pending', 'confirmed'] },
-        [Op.or]: [
-          { start_time: { [Op.lt]: end_time }, end_time: { [Op.gt]: start_time } },
-        ],
-      },
-    });
+    const whereClause = {
+      facility_id,
+      booking_date,
+      status: { [Op.in]: ['pending', 'confirmed'] },
+      [Op.or]: [
+        { start_time: { [Op.lt]: end_time }, end_time: { [Op.gt]: start_time } },
+      ],
+    };
+
+    // Exclude the current booking when checking availability during an edit
+    if (exclude_id) {
+      whereClause.id = { [Op.ne]: Number(exclude_id) };
+    }
+
+    const conflict = await Booking.findOne({ where: whereClause });
     return res.json({ available: !conflict });
   } catch (err) {
     return res.status(500).json({ message: 'Server error', error: err.message });
